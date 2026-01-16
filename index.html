@@ -19,6 +19,7 @@
                     colors: {
                         primary: '#4f46e5', // Indigo
                         secondary: '#ec4899', // Pink
+                        gold: '#f59e0b', // Amber/Gold
                     }
                 }
             }
@@ -33,47 +34,70 @@
             background-size: 20px 20px;
             color: #334155;
             overflow-x: hidden; /* Prevent horizontal scroll */
+            /* Optimize painting on mobile */
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Glow Text Effect */
+        /* Lite Glow Text Effect (Reduced blur for performance) */
         .text-glow {
-            text-shadow: 0 0 10px currentColor;
+            text-shadow: 0 0 5px currentColor;
         }
 
-        /* Card Styles with Glow Border */
+        /* Card Styles with Optimized Transition */
         .glow-card {
             background: #ffffff;
             border-radius: 12px;
-            border: 2px solid transparent; /* Prepare for colored border */
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 2px solid transparent;
+            /* Faster transition: 0.15s */
+            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, border-color 0.15s ease;
             position: relative;
             overflow: hidden;
             /* Base shadow */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+            /* Hardware acceleration hint */
+            transform: translateZ(0);
         }
 
-        .glow-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            z-index: 10;
+        .glow-card:active {
+            transform: scale(0.98);
         }
 
-        /* Category Specific Glows (Applied via JS) */
+        /* Desktop Hover only */
+        @media (hover: hover) {
+            .glow-card:hover {
+                transform: translateY(-3px) scale(1.01);
+                z-index: 10;
+            }
+        }
+
+        /* Category Specific Glows (Lighter shadows) */
         .glow-indigo {
-            border-color: #818cf8; /* Indigo 400 */
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+            border-color: #a5b4fc; /* Indigo 300 */
         }
+        .glow-indigo.active-glow, .glow-card:hover.glow-indigo {
+             border-color: #818cf8;
+             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        }
+
         .glow-teal {
-            border-color: #2dd4bf; /* Teal 400 */
-            box-shadow: 0 0 15px rgba(45, 212, 191, 0.4);
+            border-color: #5eead4; /* Teal 300 */
         }
+        .glow-teal.active-glow, .glow-card:hover.glow-teal {
+             border-color: #2dd4bf;
+             box-shadow: 0 4px 12px rgba(45, 212, 191, 0.25);
+        }
+
         .glow-rose {
-            border-color: #fb7185; /* Rose 400 */
-            box-shadow: 0 0 15px rgba(251, 113, 133, 0.4);
+            border-color: #fda4af; /* Rose 300 */
+        }
+        .glow-rose.active-glow, .glow-card:hover.glow-rose {
+             border-color: #fb7185;
+             box-shadow: 0 4px 12px rgba(251, 113, 133, 0.25);
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 
         /* Compact Image Container */
@@ -81,41 +105,51 @@
             background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
             background-size: 8px 8px;
         }
+
+        /* Floating Button Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); } /* Reduced movement */
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite; /* Slower loop to save resources */
+        }
     </style>
 </head>
-<body class="min-h-screen pb-10 font-sans antialiased">
+<body class="min-h-screen pb-24 font-sans antialiased">
 
-    <!-- Header Section -->
-    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div class="container mx-auto px-3 py-3">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+    <!-- Header Section (Reduced blur) -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm transition-all duration-200">
+        <div class="container mx-auto px-3 py-2 md:py-3">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3">
                 
                 <!-- Logo & Title -->
                 <div class="flex items-center gap-2 self-start md:self-center">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                         </svg>
                     </div>
                     <div>
-                        <h1 class="font-display font-bold text-xl tracking-tight text-slate-800 leading-none">MUSIC<span class="text-primary text-glow">LIB</span></h1>
+                        <h1 class="font-display font-bold text-lg md:text-xl tracking-tight text-slate-800 leading-none">MUSIC<span class="text-primary text-glow">LIB</span></h1>
                         <p class="text-[10px] text-slate-500 font-medium">คลังเครื่องดนตรี</p>
                     </div>
                 </div>
 
                 <!-- Controls -->
                 <div class="flex flex-row items-center gap-2 w-full md:w-auto">
-                    <!-- Tabs (Scrollable on very small screens) -->
-                    <div class="flex p-1 bg-slate-100 rounded-xl w-auto border border-slate-200 shrink-0 overflow-x-auto">
-                        <button onclick="switchTab('สากล')" id="tab-inter" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">สากล</button>
-                        <button onclick="switchTab('ไทย')" id="tab-thai" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">ไทย</button>
-                        <button onclick="switchTab('จีน')" id="tab-chinese" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">จีน</button>
+                    <!-- Tabs -->
+                    <div class="flex p-1 bg-slate-100 rounded-xl w-auto border border-slate-200 shrink-0 overflow-x-auto no-scrollbar">
+                        <button onclick="switchTab('สากล')" id="tab-inter" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap active:scale-95">สากล</button>
+                        <button onclick="switchTab('ไทย')" id="tab-thai" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap active:scale-95">ไทย</button>
+                        <button onclick="switchTab('จีน')" id="tab-chinese" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap active:scale-95">จีน</button>
                     </div>
 
                     <!-- Search -->
                     <div class="relative w-full">
                         <input type="text" id="searchInput" placeholder="ค้นหา..." 
-                            class="block w-full pl-3 pr-3 py-1.5 border-2 border-slate-200 rounded-xl bg-white text-slate-700 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-xs transition-all">
+                            class="block w-full pl-3 pr-3 py-1.5 border border-slate-300 rounded-xl bg-white text-slate-700 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-xs transition-colors duration-200">
                     </div>
                 </div>
             </div>
@@ -136,6 +170,73 @@
         </div>
         <p class="text-sm font-bold text-slate-500">ไม่พบข้อมูล...</p>
     </div>
+
+    <!-- === SYSTEM: Daily Check-in Button === -->
+    <button onclick="handleCheckIn()" class="animate-float fixed bottom-6 right-6 z-50 group active:scale-95 transition-transform duration-150">
+        <div class="relative">
+            <!-- Glow Effect (Reduced opacity for mobile) -->
+            <div class="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full blur-sm opacity-50 group-hover:opacity-80 transition duration-200"></div>
+            <!-- Button Content -->
+            <div class="relative flex items-center gap-2 bg-gradient-to-br from-yellow-400 to-yellow-500 px-4 py-3 rounded-full shadow-lg border border-white/30 text-white font-bold cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-sm drop-shadow-sm">เช็คชื่อ</span>
+            </div>
+            <!-- Badge Count (Optional visual) -->
+            <div id="btn-streak-badge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full items-center justify-center shadow-sm font-bold border border-white"></div>
+        </div>
+    </button>
+
+    <!-- === SYSTEM: Check-in Modal === -->
+    <div id="checkin-modal" class="fixed inset-0 z-[60] hidden flex-col items-center justify-center px-4 transition-opacity duration-200">
+        <!-- Backdrop (Reduced blur, simple opacity) -->
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]" onclick="closeModal()"></div>
+        
+        <!-- Modal Card -->
+        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl transform scale-100 transition-all text-center border-4 border-white/80 animate-pop-in">
+            
+            <!-- Icon / Image Area -->
+            <div class="w-20 h-20 mx-auto -mt-16 mb-4 rounded-full bg-gradient-to-br from-indigo-50 to-white flex items-center justify-center shadow-md border-4 border-white relative z-10">
+                <span id="modal-icon" class="text-4xl">📅</span>
+            </div>
+
+            <h3 id="modal-title" class="text-xl font-bold text-slate-800 mb-2">เช็คชื่อประจำวัน</h3>
+            <p id="modal-desc" class="text-slate-500 text-sm mb-6">สะสมวันเพื่อรับรางวัลพิเศษ!</p>
+
+            <!-- Stats -->
+            <div class="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-100">
+                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">สถิติของคุณ</p>
+                <div class="flex items-center justify-center gap-2 mt-1">
+                    <span class="text-3xl font-display font-bold text-primary" id="modal-count">0</span>
+                    <span class="text-sm font-medium text-slate-600 self-end mb-1">วัน</span>
+                </div>
+            </div>
+
+            <!-- Secret Code Area (Hidden by default) -->
+            <div id="reward-area" class="hidden mb-6 bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200 border-dashed">
+                <p class="text-yellow-700 text-xs font-bold mb-1">🎉 ยินดีด้วย! ครบ 100 วัน</p>
+                <div class="bg-white px-3 py-2 rounded-lg border border-yellow-200">
+                    <code class="text-lg font-mono font-bold text-yellow-600 tracking-widest select-all">MUSIC-MASTER-99</code>
+                </div>
+                <p class="text-[10px] text-yellow-600 mt-1">แคปหน้าจอนี้เก็บไว้เลย!</p>
+            </div>
+
+            <button onclick="closeModal()" class="w-full py-2.5 bg-slate-800 text-white rounded-xl font-semibold shadow-md hover:bg-slate-700 active:bg-slate-900 active:scale-95 transition-all duration-150">
+                ตกลง
+            </button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pop-in {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop-in {
+            animation: pop-in 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
 
     <script>
         // --- Data ---
@@ -158,7 +259,7 @@
             { category: "เครื่องตีสากล (Percussion)", title: "ทิมปานี", en:"Timpani", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Timpani.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1QNVlcHSseSLU8fQt-mic7C2JEXssn8fS" },
             { category: "เครื่องตีสากล (Percussion)", title: "กลองใหญ่", en:"Bass Drum", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Concert Bass Drum.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1Or2y85gadJz5pypioxNmyEmO7ZWPdcET" },
             { category: "เครื่องตีสากล (Percussion)", title: "กลองรีเทนเนอ", en:"retenner", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองเทเนอ.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1ueeRBQX-0HYOIeJPHK6b6h8aVoO4DENj" },
-			{ category: "เครื่องตีสากล (Percussion)", title: "กลองเล็ก", en:"Snare Drum", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Snare Drum.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1VBJJMgX22i1A2aLZV2xeClhCKSnqaMli" },
+            { category: "เครื่องตีสากล (Percussion)", title: "กลองเล็ก", en:"Snare Drum", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Snare Drum.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1VBJJMgX22i1A2aLZV2xeClhCKSnqaMli" },
             { category: "เครื่องตีสากล (Percussion)", title: "บองโก", en:"Bongo", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Bongo Drums.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1fpiHEL2H9TKIzOLUpQNeZmI8EQ9Jzufg" },
             { category: "เครื่องตีสากล (Percussion)", title: "คองกา", en:"Conga", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/conga drum.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1jKc5INe6jOlGqO97GjTclfWhmnchykY9" },
             { category: "เครื่องตีสากล (Percussion)", title: "แทมบูรีน", en:"Tambourine", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Tambourine.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1qYCIXRJQ4DtarBxvNKRwyYhMfrsRXtbU" },
@@ -320,7 +421,7 @@
 
             tabs.forEach(tab => {
                 // Reset basic classes
-                tab.el.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap";
+                tab.el.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap active:scale-95";
                 
                 if (currentTab === tab.name) {
                     // Active State
@@ -444,6 +545,55 @@
                     container.appendChild(grid);
                 }
             });
+            
+            // Re-apply glow logic for hover on desktop if needed via JS or keep CSS hover
+            // We rely on CSS hover media query for performance
+        }
+
+        // --- Daily Check-in Logic ---
+        function handleCheckIn() {
+            const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+            const lastCheckIn = localStorage.getItem('dailyCheckin_lastDate');
+            let count = parseInt(localStorage.getItem('dailyCheckin_count') || '0');
+
+            if (lastCheckIn === today) {
+                // Already checked in today
+                showModal('⚠️', 'เช็คชื่อไปแล้ว', 'คุณได้เช็คชื่อของวันนี้ไปเรียบร้อยแล้ว  กลับมาใหม่พรุ่งนี้นะครับ เช็คชื่อครบ 100 รับโค๊ดลบโฆษณาถาวร', count, false);
+            } else {
+                // Success Check-in
+                count++;
+                localStorage.setItem('dailyCheckin_count', count);
+                localStorage.setItem('dailyCheckin_lastDate', today);
+                
+                // Check if reached 100 days
+                if (count === 100) {
+                    showModal('🏆', 'สุดยอดไปเลย!', 'ยินดีด้วย! คุณสะสมครบ 100 วันแล้ว รับโค้ดลับไปเลย', count, true);
+                } else {
+                    showModal('✅', 'เช็คชื่อสำเร็จ', 'บันทึกการเข้าใช้งานวันนี้เรียบร้อยแล้ว สะสมให้ครบ 100 วันนะ!', count, false);
+                }
+            }
+        }
+
+        function showModal(icon, title, desc, count, isReward) {
+            document.getElementById('modal-icon').textContent = icon;
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-desc').textContent = desc;
+            document.getElementById('modal-count').textContent = count;
+            
+            const rewardArea = document.getElementById('reward-area');
+            if (isReward) {
+                rewardArea.classList.remove('hidden');
+            } else {
+                rewardArea.classList.add('hidden');
+            }
+
+            document.getElementById('checkin-modal').classList.remove('hidden');
+            document.getElementById('checkin-modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('checkin-modal').classList.add('hidden');
+            document.getElementById('checkin-modal').classList.remove('flex');
         }
 
         // Listeners
