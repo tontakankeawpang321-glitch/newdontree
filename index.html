@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glow Paper Music Library | คลังเครื่องดนตรี</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts: Kanit (Thai) & Outfit (English) -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4f46e5', // Indigo
+                        secondary: '#ec4899', // Pink
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            /* Dot pattern background */
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 20px 20px;
+            color: #334155;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Glow Text Effect */
+        .text-glow {
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        /* Card Styles with Glow Border */
+        .glow-card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 2px solid transparent; /* Prepare for colored border */
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            /* Base shadow */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .glow-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            z-index: 10;
+        }
+
+        /* Category Specific Glows (Applied via JS) */
+        .glow-indigo {
+            border-color: #818cf8; /* Indigo 400 */
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+        .glow-teal {
+            border-color: #2dd4bf; /* Teal 400 */
+            box-shadow: 0 0 15px rgba(45, 212, 191, 0.4);
+        }
+        .glow-rose {
+            border-color: #fb7185; /* Rose 400 */
+            box-shadow: 0 0 15px rgba(251, 113, 133, 0.4);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        /* Compact Image Container */
+        .img-container {
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 8px 8px;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-10 font-sans antialiased">
+
+    <!-- Header Section -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="container mx-auto px-3 py-3">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+                
+                <!-- Logo & Title -->
+                <div class="flex items-center gap-2 self-start md:self-center">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="font-display font-bold text-xl tracking-tight text-slate-800 leading-none">MUSIC<span class="text-primary text-glow">LIB</span></h1>
+                        <p class="text-[10px] text-slate-500 font-medium">คลังเครื่องดนตรี</p>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex flex-row items-center gap-2 w-full md:w-auto">
+                    <!-- Tabs (Scrollable on very small screens) -->
+                    <div class="flex p-1 bg-slate-100 rounded-xl w-auto border border-slate-200 shrink-0 overflow-x-auto">
+                        <button onclick="switchTab('สากล')" id="tab-inter" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">สากล</button>
+                        <button onclick="switchTab('ไทย')" id="tab-thai" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">ไทย</button>
+                        <button onclick="switchTab('จีน')" id="tab-chinese" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">จีน</button>
+                    </div>
+
+                    <!-- Search -->
+                    <div class="relative w-full">
+                        <input type="text" id="searchInput" placeholder="ค้นหา..." 
+                            class="block w-full pl-3 pr-3 py-1.5 border-2 border-slate-200 rounded-xl bg-white text-slate-700 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-xs transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-container" class="container mx-auto max-w-7xl px-2 py-4 md:py-8 min-h-[60vh]">
+        <!-- Cards injected by JS -->
+    </main>
+
+    <!-- No Results State -->
+    <div id="no-result" class="hidden flex-col items-center justify-center py-10 text-center">
+        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-md border border-slate-100 animate-bounce">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <p class="text-sm font-bold text-slate-500">ไม่พบข้อมูล...</p>
+    </div>
+
+    <script>
+        // --- Data ---
+        const ITEMS = [
+            // === เครื่องสายสากล ===
+             { category: "เครื่องสายสากล (Strings)", title: "กีตาร์", en:"Guitar", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กีต้า.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1KWgHzxReWCBwBlFxNfkXw2TLBxXgmT6D" },
+            { category: "เครื่องสายสากล (Strings)", title: "เบส", en:"Bass", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/bas pro.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/13zdB3LJE9Qqv_r078IuLs0GBoHHUZFMc" },
+            { category: "เครื่องสายสากล (Strings)", title: "ไวโอลิน", en:"Violin", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ไวโอลิน.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1LweRIssFvkmnAeDy2oWQU7DLvioRjyMB" },
+            { category: "เครื่องสายสากล (Strings)", title: "วิโอลา", en:"Viola", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/viola.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/13vcHErp9IzN8zlURRxVb3VA2F0C2iPlB" },
+            { category: "เครื่องสายสากล (Strings)", title: "เชลโล", en:"Cello", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/cello.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1Z2YaG5rluwLJiuSjyVIWMhupqpqq_ZWF" },
+            { category: "เครื่องสายสากล (Strings)", title: "ดับเบิลเบส", en:"Double Bass", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/DoubleBass.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/13zdB3LJE9Qqv_r078IuLs0GBoHHUZFMc" },
+            { category: "เครื่องสายสากล (Strings)", title: "ฮาร์ป", en:"Harp", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/VirtualHarp.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1G4cXdwxawtyydQMq5vvD9e0QVf7AhAN0" },
+            { category: "เครื่องสายสากล (Strings)", title: "แบนโจ", en:"Banjo", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Banjo.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1u6igSfqK3CXDZZFlpb06QqvqUuwlIUhD" },
+            { category: "เครื่องสายสากล (Strings)", title: "แมนโดลิน", en:"Mandolin", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Mandolin.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1gwbwk21xsk0tkyTo6KAjSSoPDLhdksCv" },
+            { category: "เครื่องสายสากล (Strings)", title: "ลูท", en:"Lute", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Lute.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/11xqS3W3ZTyqP9hg60zn1iv8OLyIbqoI7"},
+            { category: "เครื่องสายสากล (Strings)", title: "ไลร์", en:"Lyre", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ไลร์(Lyre).html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1FxlhfzWjj9SCYTFeTweKfG-5FtrzIqWV" },
+
+            // === เครื่องตีสากล ===
+            { category: "เครื่องตีสากล (Percussion)", title: "กลองชุด", en:"Drum Set", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/drumset.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1P26FF0gjNXVl-RjxvTLNtaXOAoGzwDms" },
+            { category: "เครื่องตีสากล (Percussion)", title: "ทิมปานี", en:"Timpani", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Timpani.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1QNVlcHSseSLU8fQt-mic7C2JEXssn8fS" },
+            { category: "เครื่องตีสากล (Percussion)", title: "กลองใหญ่", en:"Bass Drum", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Concert Bass Drum.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1Or2y85gadJz5pypioxNmyEmO7ZWPdcET" },
+            { category: "เครื่องตีสากล (Percussion)", title: "กลองรีเทนเนอ", en:"retenner", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองเทเนอ.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1ueeRBQX-0HYOIeJPHK6b6h8aVoO4DENj" },
+			{ category: "เครื่องตีสากล (Percussion)", title: "กลองเล็ก", en:"Snare Drum", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Snare Drum.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1VBJJMgX22i1A2aLZV2xeClhCKSnqaMli" },
+            { category: "เครื่องตีสากล (Percussion)", title: "บองโก", en:"Bongo", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Bongo Drums.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1fpiHEL2H9TKIzOLUpQNeZmI8EQ9Jzufg" },
+            { category: "เครื่องตีสากล (Percussion)", title: "คองกา", en:"Conga", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/conga drum.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1jKc5INe6jOlGqO97GjTclfWhmnchykY9" },
+            { category: "เครื่องตีสากล (Percussion)", title: "แทมบูรีน", en:"Tambourine", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Tambourine.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1qYCIXRJQ4DtarBxvNKRwyYhMfrsRXtbU" },
+            { category: "เครื่องตีสากล (Percussion)", title: "เบลไลลา", en:"Bell Lyre", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Bellaila.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1mgJJoXTebO12BIEU43g5RWYA4mA4RhWH" },
+            { category: "เครื่องตีสากล (Percussion)", title: "ไซโลโฟน", en:"Xylophone", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Xylophone.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1XrS1j9jk9JZj_voEg7bI_KUybmlx3jBP" },
+            { category: "เครื่องตีสากล (Percussion)", title: "ไวบราโฟน", en:"Vibraphone", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Vibraphone.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1NKHP2823qGxTVR2GZ4xRLZIC8BI5kUc9" },
+            { category: "เครื่องตีสากล (Percussion)", title: "ไลน์เบล", en:"Line Bell", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Line Bell.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1sSU9fz7ExS50tpXwc3pbnzkwFmR22ud8" },
+            { category: "เครื่องตีสากล (Percussion)", title: "ไทรแองเกิล", en:"Triangle", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Triangle.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/15SmiCdgbBVpAewsP67I3QOw8RpRzxae0" },
+            { category: "เครื่องตีสากล (Percussion)", title: "คาสทาเนท", en:"Castanets", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Castanets.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1cf77Da2SZuzazENdSgtnrKC6PxYJpk8x" },
+            { category: "เครื่องตีสากล (Percussion)", title: "มาราคัส", en:"Maracas", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Maracas.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/17x9bfWqQhY0iBohpFYV9YeTOcHZU9Pz5" },
+            { category: "เครื่องตีสากล (Percussion)", title: "คาบาซา", en:"Cabasa", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Cabaza.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1g2DhLYEPK_GifuyM5g6sFxmrT5nyD_Mp" },
+            { category: "เครื่องตีสากล (Percussion)", title: "มาริมบา", en:"Marimba", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Marimba.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1E7mCkte81ij-GFuBdl3jgZZkvP1_jy2C" },
+            { category: "เครื่องตีสากล (Percussion)", title: "คาวเบล", en:"Cowbell", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Cowbell.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1jxW7TSkCvwYP0LYoNhvCSjpGvgo8YIA-" },
+            { category: "เครื่องตีสากล (Percussion)", title: "ระฆังราว", en:"Tubular Bells", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Tubular Bells.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1Zw4TQqf-gLmS0-3alfngx9FrXnz5EXDk" },
+
+            // === เครื่องลิ่มนิ้ว ===
+            { category: "เครื่องลิ่มนิ้ว (Keyboards)", title: "ออร์แกน", en:"Organ", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Organ.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/174O8Cjqrgv3dCZoRGslc_x-CsT2L8fdi" },
+            { category: "เครื่องลิ่มนิ้ว (Keyboards)", title: "เมโลเดียน", en:"Melodica", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Melodian.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1WOCeB_mDF5GrCTfRzJ14GWNxgsRSe5bE" },
+            { category: "เครื่องลิ่มนิ้ว (Keyboards)", title: "เปียโน", en:"Piano", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Piano.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1Or5VzAvQmSENdXggoUMxsWSlwJRfjC5M" },
+            { category: "เครื่องลิ่มนิ้ว (Keyboards)", title: "แอคคอร์เดียน", en:"Accordion", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Accordion.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1pWbTNdyk16PrLZ__xaUgx14U370FVzDl" },
+            { category: "เครื่องลิ่มนิ้ว (Keyboards)", title: "ฮาร์ปซิคอร์ด", en:"Harpsichord", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Harpsichord.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1G4cXdwxawtyydQMq5vvD9e0QVf7AhAN0" },
+            { category: "เครื่องลิ่มนิ้ว (Keyboards)", title: "อิเล็กโทน", en:"Electone", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Electone.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1Fd5lR1-QRD7uVT8laiCoKg44gS8gaeWU" },
+            { category: "เครื่องลิ่มนิ้ว (Keyboards)", title: "แคลฟวิคอร์ด", en:"Clavichord", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Clavichord.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1mhK3xNj_bVaphKW7kderj9fg7GnjSRun" },
+
+            // === เครื่องเป่าลมไม้ ===
+            { category: "เครื่องเป่าลมไม้ (Woodwind)", title: "เมาท์ออแกน", en:"Harmonica", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/เมาท์ออแกน.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1q9B-rkLHZBP5v70No7B-KbVWGnFD1qsA" },
+            { category: "เครื่องเป่าลมไม้ (Woodwind)", title: "ฟลูต", en:"Flute", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Flute.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1gwJq9jFG4RoZ63zCN_5Ov9PQBm0mFpDq" },
+            { category: "เครื่องเป่าลมไม้ (Woodwind)", title: "แซกโซโฟน", en:"Saxophone", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Saxophone.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1lUuvjI6SM-DMXYq8Y-aOLRipvTLeF7M3" },
+            { category: "เครื่องเป่าลมไม้ (Woodwind)", title: "โอโบ", en:"Oboe", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Oboe.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1FvRs8b_LlefLUiJCly2VqvyJVvcTU3_c" },
+            { category: "เครื่องเป่าลมไม้ (Woodwind)", title: "คลาริเน็ต", en:"Clarinet", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Clarinet.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1DeLE8Cp-bnTfaYWCRWSekSZmpgDuzhmu" },
+            { category: "เครื่องเป่าลมไม้ (Woodwind)", title: "บาสซูน", en:"Bassoon", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Bassoon.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1K0Hd8qVRnBYTgOKFPKPOH6xgeVnBlYxV" },
+            { category: "เครื่องเป่าลมไม้ (Woodwind)", title: "รีคอร์เดอร์", en:"Recorder", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Recorder.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1zothzAhQLGhnYiA1ctop7XFXtC5PtgvH" },
+            { category: "เครื่องเป่าลมไม้ (Woodwind)", title: "ปิคโคโล", en:"Piccolo", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Piccolo.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/17gJ0orwEKDAf_l0MFDWQAj-n1cXKtFKw" },
+            { category: "เครื่องเป่าลมไม้ (Woodwind)", title: "คอร์แองเกลส์", en:"Cor Anglais", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Cor Anglais.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1y83Pxoli8zfIewPk9oPZD3AoaBPNmBaA" },
+
+            // === เครื่องเป่าทองเหลือง ===
+            { category: "เครื่องเป่าทองเหลือง (Brass)", title: "ทรอมโบน", en:"Trombone", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Trombone.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1j0qH2WswoCI8JTVZdc86IMVj-_ezO7qx" },
+            { category: "เครื่องเป่าทองเหลือง (Brass)", title: "ทรัมเป็ต", en:"Trumpet", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Trumpet.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1gICfWoI7RU1G0bfyw3ozLYFVEbO77SJX" },
+            { category: "เครื่องเป่าทองเหลือง (Brass)", title: "ทูบา", en:"Tuba", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/tuba.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1R8Hu-9EmizJL9_WhxNBusyj4wU4JwUS9" },
+            { category: "เครื่องเป่าทองเหลือง (Brass)", title: "ฟลูเกลฮอร์น", en:"Flugelhorn", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Flugelhorn.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1uhne4dik51MNtuLL3Gs_vNQIFLEhGYhM" },
+            { category: "เครื่องเป่าทองเหลือง (Brass)", title: "เฟรนช์ฮอร์น", en:"French Horn", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/French Horn.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1h9MDqJGXHQMKwarJzkJylbTwMRib76aq" },
+            { category: "เครื่องเป่าทองเหลือง (Brass)", title: "คอร์เน็ท", en:"Cornet", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Cornet .html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1B4GYb684NxmAywyCUdA0T0ciOMEyAZ_M" },
+            { category: "เครื่องเป่าทองเหลือง (Brass)", title: "ซูซาโฟน", en:"Sousaphone", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Sousaphone.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/11AE0bdmTYoGKzkoyAOza4HXldlGqGfmu" },
+            { category: "เครื่องเป่าทองเหลือง (Brass)", title: "ยูโฟเนียม", en:"Euphonium", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Euphonium.html", badge: "สากล",img: "https://lh3.googleusercontent.com/d/1Q4Eb6O20DjvtXGS_EXv05An03HZhBoOE" },
+
+            // === ดนตรีไทย: เครื่องดีด ===
+            { category: "ดนตรีไทย: เครื่องดีด", title: "จะเข้", en:"Jakhe", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/จระเข้.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1t4ICH_84E8Vu8fa8ICWMxUkR6kMsFlEl" },
+            { category: "ดนตรีไทย: เครื่องดีด", title: "กระจับปี่", en:"Krachappi", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Krajappi.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1-VEODWYZ-irBMQDQHJc0l4xZ2WKp-0P_" },
+            { category: "ดนตรีไทย: เครื่องดีด", title: "ซึง", en:"Sueng", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ซึง.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1cbk1jU7CHHlSfr6Ju8TDg8GJS5aOTlGe" },
+            { category: "ดนตรีไทย: เครื่องดีด", title: "พิณเพียะ", en:"Phin Phia", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/พิณเพี้ย.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1kONFKVXw7o0j5kQVSG2W8R2hLco3MZwl" },
+            { category: "ดนตรีไทย: เครื่องดีด", title: "ไหซอง", en:"Hai Song", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ไหซอง.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/11HZ4WsCEDEX2pZrrIuI7DghGAKYnernf" },
+            { category: "ดนตรีไทย: เครื่องดีด", title: "พิณน้ำเต้า", en:"Phin Nam Tao", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/พิณน้ำเต้า.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1il45UnLP4UmHlhRKW0hzCUyyx-Wbagrd" },
+
+            // === ดนตรีไทย: เครื่องสี ===
+            { category: "ดนตรีไทย: เครื่องสี", title: "ซอด้วง", en:"Saw Duang", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ซอด้วง .html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1mS1DfipJHrASKt69CnyP5rMK2f52LZlK" },
+            { category: "ดนตรีไทย: เครื่องสี", title: "ซออู้", en:"Saw U", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ซออู้.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/15AkarDpDp9cByYmqfH0WziNgIhzIL3r7" },
+            { category: "ดนตรีไทย: เครื่องสี", title: "ซอสามสาย", en:"Saw Sam Sai", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ซอสามสายจำลอง.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1j_E3MOzX5p11Flran-6KQqDrWQcmNavU" },
+            { category: "ดนตรีไทย: เครื่องสี", title: "สะล้อ", en:"Salo", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/สะล้อ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1lHulrYwXuD3BG8gOPLHQfcdAGpLWDvJo" },
+            { category: "ดนตรีไทย: เครื่องสี", title: "ซอกันตรึม", en:"Saw Kantrum", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ซอกันตรึม.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1TmCmMHBSkYTROufePQjpnrGh8n-ZkrLD" },
+            { category: "ดนตรีไทย: เครื่องสี", title: "รือบับ", en:"Rebab", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/รือบับ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1gjdERlrU61m9S5FWvbOFKBrSzmmQF1uz" },
+
+            // === ดนตรีไทย: เครื่องตี ===
+            { category: "ดนตรีไทย: เครื่องตี", title: "ระนาดเอก", en:"Ranat Ek", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ระนาดเอก.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1KQqVfYGrGAPgakwi0RDVBKYt7w6sf4u1" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "ระนาดทุ้ม", en:"Ranat Thum", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ระนาดทุ้ม.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1Z0Ex71vT4crELdXKRdDIhmO1dIBYCm7A" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "กรับ", en:"Krap", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กรับ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1Ajbq9ixXAfHN9sRyJ_ci2ac-jjM2xKPY" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "โปงลาง", en:"Pong Lang", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/โปงลาง.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1K97GEt7FlTgh2fFuRCEHGRbeDmozIkVt" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "ระนาดเอกเหล็ก", en:"Ranat Ek Lek", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ระนาดเอกเหล็ก.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1_m3IAwxQ-kK0FozNpRCOZb5c2gsgVq60" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "ฆ้องวงใหญ่", en:"Gong Wong Yai", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ฆ้องวงใหญ่.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/10SJEM5XXQtdbN9quCk5PiLCTlMHWZh1v" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "ฆ้องวงเล็ก", en:"Gong Wong Lek", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ฆ้องวงเล็ก.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1vibYGY9NOTId0D0HcGKSCt4lhkMwsdp4" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "ฆ้องมอญ", en:"Gong Mon", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ฆ้องมอญ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1oVOG8hsQPUsEEZm5G1axhyy_V7Al5SEe" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "ฆ้องโหม่ง", en:"Gong Mong", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ฆ้องโหม่ง.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1ZuvJXoz9xSc5PowZKzpW9iBbs55kflMB" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "ฉิ่ง", en:"Ching", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ฉิ่ง.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1KKxjgWjj4_KZn6dpBmGlhCCz4LRaSZ8w" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "ฉาบ", en:"Chap", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ฉาบ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/18Ofs9c0sNTdKDm6PVn8E7d8pLBkp4A1k" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "ฆ้องคู่", en:"Gong Khu", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ฆ้องคู่.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1TAHz7Huc3_IUOmFs_jOdzpFTfLD6a4oq" },
+            { category: "ดนตรีไทย: เครื่องตี", title: "ฆ้องราว", en:"Gong Rao", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ฆ้องราว.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1mAQN6BF5fbs_GGQOZ8E6F4opM8H3fy1c" },
+
+            // === ดนตรีไทย: กลอง ===
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "กลองแขก", en:"Klong Khaek", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองแขก.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1PTplBNpffxIbk12ksIa2z5XCX0wrRLRm" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "กลองมลายู", en:"Klong Malayu", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองมลายู.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1xilmjrL8UEKNHAZS5hFq7H4wia38LZiP" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "ตะโพน", en:"Taphon", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ตะโพน.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1jOh7WpkhJMAgTWQl-O9jnIMstcEzRRed" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "ตะโพนมอญ", en:"Taphon Mon", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ตะโพนมอญ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1OhW6nQ_KqZqqBi1NkmiFWDJIs1RPvuLK" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "เปิงมาง", en:"Poeng Mang", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/เปิงมาง.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1knWo7bv74kDSdyy5FKIVfxAvfUI8gE0A" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "กลองทัด", en:"Klong That", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองทัด.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1tax86YM61Okd32dXhiUyuvYj97SIJEyL" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "กลองยาว", en:"Klong Yao", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองยาวไทย.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1y-3ewh1VznV_ojXa3aBcANjG5NkRAR0s" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "กลองสองหน้า", en:"Klong Song Na", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองสองหน้า.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1p_Q10HpaK_PXWj5WWBlhlYhhWvS9cY1Z" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "โทน", en:"Thon", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองโทน.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1oyIKI-9JP08eAtMH104_lVbUOYXP9G1L" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "รำมะนา", en:"Rammana", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองรำมะนาว.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1mupbHryXWyQnOxnd47vNwnkse1OBOp31" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "กลองสะบัดชัย", en:"Klong Sabat Chai", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองสะบัดชัย.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1tpeuZOH_TVtnabz1_3iFj7Ktsv96kD9F" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "กลองชาตรี", en:"Klong Chatri", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองชาตรี.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/10UWIGiIubVF73T1a_NqZw1MfVtJxn5zK" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "กลองมังคละ", en:"Klong Mangkala", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองมังคละ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1ypyXWpNBEEO6tQVUaTMnLJpiYp0G7ta5" },
+            { category: "ดนตรีไทย: กลอง (หนัง)", title: "กลองมโหระทึก", en:"Klong Mahorathuk", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองมโหระทึก.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1rl8uNCbt8SclIj9b9EeNQh90R1wdsGQo" },
+
+            // === เครื่องเป่าไทย ===
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่นอก", en:"Pi Nok", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่นอก.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1Vanm48A0E2eJYKB0sHGhQma2AJfN-H4I" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่กลาง", en:"Pi Klang", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่กลาง.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1q_uThEVvCgEHB6o088ToeXr77O_p5Oyy" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่ใน", en:"Pi Nai", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่ใน.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1v9od0twJLzoLpul4q9OLyzNVUv3LXQJH" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่ชวา", en:"Pi Chawa", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่ชวา.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1-4sj5gJ9vNviJElZs-fZBSueELjR6S61" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่มอญ", en:"Pi Mon", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่มอญ.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1u--1Lh2myLJWoEupf3n0poUBJ6aHy2lo" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่ไฉน", en:"Pi Chanai", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่ฉไน.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1MQSn48wN42BJdydhsNlIWpy3B83MykRU" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่กาหลอ", en:"Pi Kalo", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่กาหลอ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1owIO6Y-r_EtEia4cswCw3PkNTcdCPMyP" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "แคน", en:"Khaen", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/แคนอีสาน.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1xociefzHv60AnxIWD67wRkrexFpMV3n1" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่จุม", en:"Pi Jum", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่จุม.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/16X6nU2qPa7hqNnU1hFFW5R84iW2cL8sQ" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่อ้อ", en:"Pi Or", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่อ้อ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1XSfdY00YNsqPqSm0liWazBZnLtAa8wnL" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่แน", en:"Pi Nae", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่ภูแน.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1C9TrqGZDvE946B7CGd-BVNN9qO7UHxgF" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ปี่ภูไท", en:"Pi Phu Thai", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ปี่ภูไท.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1B_LSwEweFD__BmNMYEojDgAvMvaJolS9" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ขลุ่ยหลิบ", en:"Khlui Lip", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ขลุยหลิบ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/138jjORuj5gVmciNPgJ1eG3KAwhj2pK3v" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ขลุ่ยเพียงออ", en:"Khlui Phiang Aw", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ขลุ่ยเพียงอ้อ.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1ZbgIPp830w0kpke56z7knxWs2TAjQ0YO" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ขลุ่ยอู้", en:"Khlui U", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ซออู้เสมือนจริง.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1uQSk5-02MfHPIu6aIOOeL7PEfr5cArbz" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ขลุ่ยกรวด", en:"Khlui Kruat", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ขลุยกรวด.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1A9TRzyFjT8QmkxfMr0Fay1g62961lc7z" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "ขลุ่ยนก", en:"Khlui Nok", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ขลุ่ยนก.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/192s-ATUJm7p5f8sEEQShFXYHfgjfAZjx" },
+            { category: "ดนตรีไทย: เครื่องเป่า", title: "โหวด", en:"Wot", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/โหวต.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1fhHsLQk2B_PxUaN1g8pKiN3FqyTsOoYC" },
+
+            // === เครื่องดนตรีไทยอื่นๆ ===
+            { category: "ดนตรีไทยอื่นๆ", title: "ขิม", en:"Khim", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ขิม.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1JqQN8usM7d4kYX7V4KZuLrr1y-PYsb4l" },
+            { category: "ดนตรีไทยอื่นๆ", title: "อังกะลุง", en:"Angklung", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/อังกะลุง.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1KwbrHRp22gm7Po4JFsCsFBl78b1vJCzm" },
+            { category: "ดนตรีไทยอื่นๆ", title: "ระนาดแก้ว", en:"Ranat Kaeo", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ระนาดแก้ว.html", badge: "ไทย", img: "https://lh3.googleusercontent.com/d/1nCES-sqb4lejJ7O_o04E5SN9wxHg6F_j" },
+            { category: "ดนตรีไทยอื่นๆ", title: "บัณเฑาะว์", en:"Banthaw", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/บัณเฑาะ.html", badge: "ไทย",img: "https://lh3.googleusercontent.com/d/1tPgiXcx36qwM2pymmg7Qpvosr1HCSZYq" },
+            
+            // === ดนตรีจีน (เพิ่มใหม่) ===
+            { category: "ดนตรีจีน: เครื่องสาย", title: "กู่เจิง", en:"Guzheng", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กู่เจิง.html", badge: "จีน", img: "https://lh3.googleusercontent.com/d/1mK-7Mdf7sKlfHrjUk1kzwJEEvQJfSPXx" },
+            { category: "ดนตรีจีน: เครื่องสาย", title: "เอ้อหู", en:"Erhu", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/เอ้อหู.html", badge: "จีน", img: "https://lh3.googleusercontent.com/d/1c2iUOLgV4GYEG8ZaqhbmWNU5ncqAIf9Z" },
+            { category: "ดนตรีจีน: เครื่องสาย", title: "ผีผา", en:"Pipa", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ผีผา.html", badge: "จีน", img: "https://lh3.googleusercontent.com/d/12G97xZj-R3lDiNfLM9bxztoDZafLuw_f" },
+            { category: "ดนตรีจีน: เครื่องสาย", title: "กู่ฉิน", en:"Guqin", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กู้ฉิน.html", badge: "จีน", img: "https://lh3.googleusercontent.com/d/1uHiDMcTGNAEmKe9OBsW9J8KMjmoYhgjw" },
+            { category: "ดนตรีจีน: เครื่องสาย", title: "หยางฉิน", en:"Yangqin", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/หยางฉิน.html", badge: "จีน", img: "https://lh3.googleusercontent.com/d/1QW0S8bWz3HBrudm-fiZ8cTFIynv-sW2Y" },
+            { category: "ดนตรีจีน: เครื่องเป่า", title: "ขลุ่ยผิว (ตี๋จึ)", en:"Dizi", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ขลุยผิว.html", badge: "จีน", img: "https://lh3.googleusercontent.com/d/1t1YNnsuO3HQkN8zySfcha4EL7l0CAJee" },
+            { category: "ดนตรีจีน: เครื่องเป่า", title: "ซัวน่า", en:"Suona", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ขัวน่า.html", badge: "จีน", img: "https://lh3.googleusercontent.com/d/1FZy22LKXFIa-kUKUFef40PnbZci6Xmn7" },
+            { category: "ดนตรีจีน: เครื่องเป่า", title: "น้ำเต้าปี่", en:"Hulusi", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/ขลุยน้ำเต้า.html", badge: "จีน", img: "https://lh3.googleusercontent.com/d/1DsRxz0UKFPHUZN4QYuN_rjXLnU5zIk2R" },
+            { category: "ดนตรีจีน: เครื่องตี", title: "กลองหนัง", en:"Tanggu", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กลองจีนจำลอง.html", badge: "จีน", img: "https://lh3.googleusercontent.com/d/1zt5ivTnPzBFboP0DaI6ckALEw_hNlGIk" },
+            { category: "ดนตรีจีน: เครื่องตี", title: "ลั่ว (ฆ้อง)", en:"Luo", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/Luo (Gong).html", badge: "จีน", img: "https://lh3.googleusercontent.com/d/1yjy15iLuEt2cncOlpIZ7OLF4uCsUrthI" },
+        ];
+
+
+        // --- Elements ---
+        const container = document.getElementById('main-container');
+        const searchInput = document.getElementById('searchInput');
+        const noResult = document.getElementById('no-result');
+        const tabInter = document.getElementById('tab-inter');
+        const tabThai = document.getElementById('tab-thai');
+        const tabChinese = document.getElementById('tab-chinese');
+
+        // --- State Management ---
+        let currentTab = sessionStorage.getItem('musicApp_tab') || 'สากล';
+        let searchText = sessionStorage.getItem('musicApp_search') || '';
+
+        searchInput.value = searchText;
+
+        function saveState() {
+            sessionStorage.setItem('musicApp_tab', currentTab);
+            sessionStorage.setItem('musicApp_search', searchText);
+        }
+
+        // --- Styles for Active/Inactive Tabs ---
+        function updateTabStyles() {
+            const tabs = [
+                { el: tabInter, name: 'สากล', color: 'bg-indigo-500' },
+                { el: tabThai, name: 'ไทย', color: 'bg-teal-500' },
+                { el: tabChinese, name: 'จีน', color: 'bg-rose-500' }
+            ];
+
+            tabs.forEach(tab => {
+                // Reset basic classes
+                tab.el.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap";
+                
+                if (currentTab === tab.name) {
+                    // Active State
+                    if(tab.name === 'สากล') {
+                        tab.el.classList.add('bg-indigo-500', 'text-white', 'shadow-md', 'shadow-indigo-500/30', 'transform', '-translate-y-0.5');
+                    } else if (tab.name === 'ไทย') {
+                        tab.el.classList.add('bg-teal-500', 'text-white', 'shadow-md', 'shadow-teal-500/30', 'transform', '-translate-y-0.5');
+                    } else {
+                        tab.el.classList.add('bg-rose-500', 'text-white', 'shadow-md', 'shadow-rose-500/30', 'transform', '-translate-y-0.5');
+                    }
+                } else {
+                    // Inactive State
+                    tab.el.classList.add('text-slate-500', 'hover:bg-white', 'hover:text-slate-800');
+                }
+            });
+        }
+
+        function switchTab(selectedTab) {
+            currentTab = selectedTab;
+            searchInput.value = '';
+            searchText = '';
+            saveState();
+            updateTabStyles();
+            renderCards();
+        }
+
+        function renderCards() {
+            container.innerHTML = '';
+            let hasAnyResult = false;
+            const filterLower = searchText.toLowerCase();
+
+            const tabItems = ITEMS.filter(item => item.badge === currentTab);
+            const categorizedItems = new Map();
+
+            // Filter & Categorize
+            tabItems.forEach(item => {
+                if (item.title.toLowerCase().includes(filterLower) || item.en.toLowerCase().includes(filterLower)) {
+                    if (!categorizedItems.has(item.category)) {
+                        categorizedItems.set(item.category, []);
+                    }
+                    categorizedItems.get(item.category).push(item);
+                    hasAnyResult = true;
+                }
+            });
+
+            // No Results Check
+            if (!hasAnyResult) {
+                noResult.classList.remove('hidden');
+                noResult.classList.add('flex');
+            } else {
+                noResult.classList.add('hidden');
+                noResult.classList.remove('flex');
+            }
+
+            // Ordering Categories
+            const categoriesOrder = [...new Set(ITEMS.map(item => item.category))];
+
+            categoriesOrder.forEach(cat => {
+                const groupItems = categorizedItems.get(cat);
+
+                if (groupItems && groupItems.length > 0) {
+                    // Category Header
+                    const headerContainer = document.createElement('div');
+                    headerContainer.className = "flex items-center gap-2 mb-3 mt-6";
+                    
+                    const headerLine = document.createElement('div');
+                    headerLine.className = "h-0.5 flex-1 bg-slate-200 rounded-full";
+
+                    const headerTitle = document.createElement('h2');
+                    headerTitle.className = "text-lg font-bold text-slate-700";
+                    
+                    // Simple logic to shorten category name if needed on mobile
+                    let displayCat = cat.replace("เครื่อง", "").replace("ดนตรี", "");
+                    if(window.innerWidth > 640) displayCat = cat;
+
+                    headerTitle.innerHTML = `<span class="inline-block w-1.5 h-5 bg-primary rounded-full mr-2 align-middle"></span>${cat} <span class="text-xs font-medium text-slate-400 align-middle bg-slate-100 px-1.5 rounded-full">(${groupItems.length})</span>`;
+
+                    headerContainer.appendChild(headerTitle);
+                    headerContainer.appendChild(headerLine);
+                    container.appendChild(headerContainer);
+
+                    // Grid Layout (3 columns on mobile, 4 on sm, etc.)
+                    const grid = document.createElement('div');
+                    grid.className = "grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-4";
+
+                    groupItems.forEach(item => {
+                        const card = document.createElement('a');
+                        card.href = item.url || "#";
+                        card.target = item.url !== "#" ? "_blank" : "_self";
+                        card.rel = "noopener noreferrer";
+                        
+                        // Set Glow Color Class
+                        let glowClass = 'glow-indigo text-indigo-500';
+                        if (item.badge === 'ไทย') glowClass = 'glow-teal text-teal-500';
+                        if (item.badge === 'จีน') glowClass = 'glow-rose text-rose-500';
+
+                        // Card Structure
+                        card.className = `glow-card ${glowClass} p-2 flex flex-col items-center justify-between min-h-[140px]`;
+
+                        const imgUrl = item.img;
+
+                        card.innerHTML = `
+                            <!-- Image -->
+                            <div class="img-container w-full aspect-square mb-2 rounded-lg flex items-center justify-center p-2 relative overflow-hidden bg-slate-50 border border-slate-100/50">
+                                ${imgUrl ? 
+                                    `<img src="${imgUrl}" alt="${item.title}" class="w-full h-full object-contain drop-shadow-sm" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'text-[9px] text-slate-400\\'>NO IMG</span>';">` 
+                                    : `<span class="text-[9px] text-slate-400">NO IMG</span>`
+                                }
+                            </div>
+                            
+                            <!-- Texts with Glow -->
+                            <div class="text-center w-full z-10 pb-1">
+                                <h3 class="font-bold text-slate-700 text-xs md:text-sm leading-tight text-glow line-clamp-1">
+                                    ${item.title}
+                                </h3>
+                                <p class="text-[9px] md:text-[10px] text-slate-400 font-display mt-0.5 tracking-wide line-clamp-1">${item.en}</p>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                    container.appendChild(grid);
+                }
+            });
+        }
+
+        // Listeners
+        searchInput.addEventListener('input', (e) => {
+            searchText = e.target.value;
+            saveState();
+            renderCards();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTabStyles();
+            renderCards();
+        });
+
+    </script>
+</body>
+</html>
