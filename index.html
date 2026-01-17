@@ -19,7 +19,11 @@
                     colors: {
                         primary: '#4f46e5', // Indigo
                         secondary: '#ec4899', // Pink
-                        gold: '#f59e0b', // Amber/Gold
+                        gold: '#fbbf24', // Gold
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
             }
@@ -34,122 +38,142 @@
             background-size: 20px 20px;
             color: #334155;
             overflow-x: hidden; /* Prevent horizontal scroll */
-            /* Optimize painting on mobile */
-            -webkit-font-smoothing: antialiased;
         }
 
-        /* Lite Glow Text Effect (Reduced blur for performance) */
-        .text-glow {
-            text-shadow: 0 0 5px currentColor;
-        }
-
-        /* Card Styles with Optimized Transition */
-        .glow-card {
-            background: #ffffff;
-            border-radius: 12px;
-            border: 2px solid transparent;
-            /* Faster transition: 0.15s */
-            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, border-color 0.15s ease;
+        /* Glow Text Effect */
+        /* --- REDESIGNED Daily Check-in Button (Quest Style) --- */
+        .btn-quest {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: gradient-animate 4s ease infinite;
             position: relative;
             overflow: hidden;
-            /* Base shadow */
-            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
-            /* Hardware acceleration hint */
-            transform: translateZ(0);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
         }
 
-        .glow-card:active {
-            transform: scale(0.98);
+        @keyframes gradient-animate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* Desktop Hover only */
-        @media (hover: hover) {
-            .glow-card:hover {
-                transform: translateY(-3px) scale(1.01);
-                z-index: 10;
-            }
+        .quest-progress-bg {
+            background: rgba(0,0,0,0.25);
+            border-radius: 99px;
+            height: 4px;
+            width: 100%;
+            margin-top: 4px;
+            overflow: hidden;
+            position: relative;
         }
 
-        /* Category Specific Glows (Lighter shadows) */
-        .glow-indigo {
-            border-color: #a5b4fc; /* Indigo 300 */
-        }
-        .glow-indigo.active-glow, .glow-card:hover.glow-indigo {
-             border-color: #818cf8;
-             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-        }
-
-        .glow-teal {
-            border-color: #5eead4; /* Teal 300 */
-        }
-        .glow-teal.active-glow, .glow-card:hover.glow-teal {
-             border-color: #2dd4bf;
-             box-shadow: 0 4px 12px rgba(45, 212, 191, 0.25);
+        .quest-progress-bar {
+            height: 100%;
+            background: #fbbf24; /* Gold */
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px #fbbf24;
         }
 
-        .glow-rose {
-            border-color: #fda4af; /* Rose 300 */
-        }
-        .glow-rose.active-glow, .glow-card:hover.glow-rose {
-             border-color: #fb7185;
-             box-shadow: 0 4px 12px rgba(251, 113, 133, 0.25);
+        /* Modal Overlay */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-
-        /* Compact Image Container */
-        .img-container {
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 8px 8px;
+        /* Confetti Animation for Reward */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: confetti-fall 3s linear forwards;
+            top: -10px;
+            z-index: 60;
         }
 
-        /* Floating Button Animation */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-6px); } /* Reduced movement */
-            100% { transform: translateY(0px); }
-        }
-        .animate-float {
-            animation: float 4s ease-in-out infinite; /* Slower loop to save resources */
-        }
     </style>
 </head>
-<body class="min-h-screen pb-24 font-sans antialiased">
+<body class="min-h-screen pb-10 font-sans antialiased">
 
-    <!-- Header Section (Reduced blur) -->
-    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm transition-all duration-200">
-        <div class="container mx-auto px-3 py-2 md:py-3">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3">
+    <!-- Header Section -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="container mx-auto px-3 py-3">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-3">
                 
                 <!-- Logo & Title -->
-                <div class="flex items-center gap-2 self-start md:self-center">
-                    <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                        </svg>
+                <div class="flex items-center gap-2 self-start md:self-center w-full md:w-auto justify-between md:justify-start">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="font-display font-bold text-xl tracking-tight text-slate-800 leading-none">MUSIC<span class="text-primary text-glow">LIB</span></h1>
+                            <p class="text-[10px] text-slate-500 font-medium">คลังเครื่องดนตรี</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="font-display font-bold text-lg md:text-xl tracking-tight text-slate-800 leading-none">MUSIC<span class="text-primary text-glow">LIB</span></h1>
-                        <p class="text-[10px] text-slate-500 font-medium">คลังเครื่องดนตรี</p>
-                    </div>
+
+                    <!-- Daily Check-in Button (Mobile) - Redesigned -->
+                    <button onclick="handleDailyCheckIn()" id="checkInBtn" class="md:hidden btn-quest pl-2 pr-3 py-1.5 rounded-full text-white text-xs font-bold flex items-center gap-2 transition-transform active:scale-95 group">
+                        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
+                            <span class="text-sm">📅</span>
+                        </div>
+                        <div class="flex flex-col items-start min-w-[60px]">
+                             <div class="flex justify-between w-full text-[9px] opacity-90 mb-0.5">
+                                 <span>DAY</span>
+                                 <span id="rewardLockMobile">🔒</span>
+                             </div>
+                             <div class="flex items-end gap-1 leading-none">
+                                <span id="streakCountMobile" class="text-sm font-bold text-yellow-300">0</span>
+                                <span class="text-[10px] opacity-80">/100</span>
+                             </div>
+                             <!-- Mini Progress Bar Mobile -->
+                             <div class="w-full h-1 bg-black/20 rounded-full mt-1 overflow-hidden">
+                                 <div id="questBarMobile" class="h-full bg-yellow-400 w-0 transition-all duration-500"></div>
+                             </div>
+                        </div>
+                    </button>
                 </div>
 
                 <!-- Controls -->
                 <div class="flex flex-row items-center gap-2 w-full md:w-auto">
-                    <!-- Tabs -->
-                    <div class="flex p-1 bg-slate-100 rounded-xl w-auto border border-slate-200 shrink-0 overflow-x-auto no-scrollbar">
-                        <button onclick="switchTab('สากล')" id="tab-inter" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap active:scale-95">สากล</button>
-                        <button onclick="switchTab('ไทย')" id="tab-thai" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap active:scale-95">ไทย</button>
-                        <button onclick="switchTab('จีน')" id="tab-chinese" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap active:scale-95">จีน</button>
+                    
+                    <!-- Daily Check-in Button (Desktop) - Redesigned -->
+                    <button onclick="handleDailyCheckIn()" class="hidden md:flex flex-col btn-quest px-4 py-2 rounded-2xl text-white transition-all hover:scale-105 active:scale-95 mr-2 group relative min-w-[140px]">
+                        <div class="flex items-center justify-between w-full gap-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl drop-shadow-md group-hover:animate-bounce">🏆</span>
+                                <div class="flex flex-col items-start leading-none">
+                                    <span class="text-[9px] font-bold opacity-90 uppercase tracking-wider text-yellow-100">Daily Quest</span>
+                                    <span class="font-bold text-sm text-white"><span id="streakCountDesktop" class="text-yellow-300">0</span> <span class="text-xs opacity-80">/ 100 วัน</span></span>
+                                </div>
+                            </div>
+                            <div class="text-xs opacity-70 bg-black/20 p-1 rounded-md backdrop-blur-sm" id="rewardLockDesktop" title="Secret Code locked">🔒</div>
+                        </div>
+                        <!-- Progress Bar Desktop -->
+                        <div class="quest-progress-bg">
+                            <div id="questBarDesktop" class="quest-progress-bar"></div>
+                        </div>
+                    </button>
+
+                    <!-- Tabs (Scrollable on very small screens) -->
+                    <div class="flex p-1 bg-slate-100 rounded-xl w-auto border border-slate-200 shrink-0 overflow-x-auto">
+                        <button onclick="switchTab('สากล')" id="tab-inter" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">สากล</button>
+                        <button onclick="switchTab('ไทย')" id="tab-thai" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">ไทย</button>
+                        <button onclick="switchTab('จีน')" id="tab-chinese" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">จีน</button>
                     </div>
 
                     <!-- Search -->
                     <div class="relative w-full">
                         <input type="text" id="searchInput" placeholder="ค้นหา..." 
-                            class="block w-full pl-3 pr-3 py-1.5 border border-slate-300 rounded-xl bg-white text-slate-700 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-xs transition-colors duration-200">
+                            class="block w-full pl-3 pr-3 py-1.5 border-2 border-slate-200 rounded-xl bg-white text-slate-700 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-xs transition-all">
                     </div>
                 </div>
             </div>
@@ -171,75 +195,56 @@
         <p class="text-sm font-bold text-slate-500">ไม่พบข้อมูล...</p>
     </div>
 
-    <!-- === SYSTEM: Daily Check-in Button === -->
-    <button onclick="handleCheckIn()" class="animate-float fixed bottom-6 right-6 z-50 group active:scale-95 transition-transform duration-150">
-        <div class="relative">
-            <!-- Glow Effect (Reduced opacity for mobile) -->
-            <div class="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full blur-sm opacity-50 group-hover:opacity-80 transition duration-200"></div>
-            <!-- Button Content -->
-            <div class="relative flex items-center gap-2 bg-gradient-to-br from-yellow-400 to-yellow-500 px-4 py-3 rounded-full shadow-lg border border-white/30 text-white font-bold cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="text-sm drop-shadow-sm">เช็คชื่อ</span>
-            </div>
-            <!-- Badge Count (Optional visual) -->
-            <div id="btn-streak-badge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full items-center justify-center shadow-sm font-bold border border-white"></div>
-        </div>
-    </button>
-
-    <!-- === SYSTEM: Check-in Modal === -->
-    <div id="checkin-modal" class="fixed inset-0 z-[60] hidden flex-col items-center justify-center px-4 transition-opacity duration-200">
-        <!-- Backdrop (Reduced blur, simple opacity) -->
-        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]" onclick="closeModal()"></div>
-        
-        <!-- Modal Card -->
-        <div class="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl transform scale-100 transition-all text-center border-4 border-white/80 animate-pop-in">
-            
-            <!-- Icon / Image Area -->
-            <div class="w-20 h-20 mx-auto -mt-16 mb-4 rounded-full bg-gradient-to-br from-indigo-50 to-white flex items-center justify-center shadow-md border-4 border-white relative z-10">
-                <span id="modal-icon" class="text-4xl">📅</span>
-            </div>
-
-            <h3 id="modal-title" class="text-xl font-bold text-slate-800 mb-2">เช็คชื่อประจำวัน</h3>
-            <p id="modal-desc" class="text-slate-500 text-sm mb-6">สะสมวันครบ 190 วัน รับโคดลับ ลบโฆษณาฟรีถาวร</p>
-
-            <!-- Stats -->
-            <div class="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-100">
-                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">สถิติของคุณ</p>
-                <div class="flex items-center justify-center gap-2 mt-1">
-                    <span class="text-3xl font-display font-bold text-primary" id="modal-count">0</span>
-                    <span class="text-sm font-medium text-slate-600 self-end mb-1">วัน</span>
-                </div>
-            </div>
-
-            <!-- Secret Code Area (Hidden by default) -->
-            <div id="reward-area" class="hidden mb-6 bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200 border-dashed">
-                <p class="text-yellow-700 text-xs font-bold mb-1">🎉 ยินดีด้วย! ครบ 100 วัน</p>
-                <div class="bg-white px-3 py-2 rounded-lg border border-yellow-200">
-                    <code class="text-lg font-mono font-bold text-yellow-600 tracking-widest select-all">MUSIC-MASTER-99</code>
-                </div>
-                <p class="text-[10px] text-yellow-600 mt-1">แคปหน้าจอนี้เก็บไว้เลย!</p>
-            </div>
-
-            <button onclick="closeModal()" class="w-full py-2.5 bg-slate-800 text-white rounded-xl font-semibold shadow-md hover:bg-slate-700 active:bg-slate-900 active:scale-95 transition-all duration-150">
-                ตกลง
-            </button>
+    <!-- === MODALS SYSTEM === -->
+    
+    <!-- 1. General Alert Modal -->
+    <div id="alertModal" class="hidden fixed inset-0 z-[100] modal-overlay flex items-center justify-center px-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full transform transition-all scale-100 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
+            <div id="alertIcon" class="text-4xl mb-3">🔔</div>
+            <h3 id="alertTitle" class="text-lg font-bold text-slate-800 mb-1">แจ้งเตือน</h3>
+            <p id="alertMessage" class="text-sm text-slate-500 mb-5">ข้อความแจ้งเตือน</p>
+            <button onclick="closeModal('alertModal')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 rounded-xl transition-colors">ตกลง</button>
         </div>
     </div>
 
-    <style>
-        @keyframes pop-in {
-            0% { transform: scale(0.9); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .animate-pop-in {
-            animation: pop-in 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-    </style>
+    <!-- 2. Special Reward Modal (100 Days) -->
+    <div id="rewardModal" class="hidden fixed inset-0 z-[101] modal-overlay flex items-center justify-center px-4">
+        <div class="bg-gradient-to-br from-yellow-50 to-amber-100 rounded-3xl shadow-2xl p-8 max-w-sm w-full transform transition-all scale-100 text-center relative border-4 border-white/50 overflow-hidden">
+            <!-- Glow background -->
+            <div class="absolute inset-0 bg-yellow-400 opacity-10 blur-xl rounded-full"></div>
+            <!-- Spotlight effect -->
+            <div class="absolute -top-20 -left-20 w-40 h-40 bg-white opacity-20 blur-3xl rounded-full"></div>
+            
+            <div class="relative z-10">
+                <div class="text-7xl mb-2 animate-bounce-slow filter drop-shadow-lg">🎁</div>
+                <h3 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-yellow-600 mb-2 font-display uppercase tracking-tight">Mission Complete!</h3>
+                <p class="text-amber-800 font-medium mb-6 text-sm">สุดยอด! คุณเช็คชื่อครบ 100 วันแล้ว<br>นี่คือรางวัลความพยายามของคุณ</p>
+                
+                <!-- Secret Code Box -->
+                <div class="group relative bg-white rounded-2xl p-1 shadow-inner border border-amber-200 mb-6 transform transition-transform hover:scale-105">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow-sm">
+                        SECRET CODE
+                    </div>
+                    <div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-4 flex flex-col items-center justify-center gap-2 group-hover:border-amber-400 transition-colors">
+                         <div class="text-xs text-slate-400 mb-1">แตะเพื่อคัดลอก</div>
+                         <code id="secretCode" onclick="copyCode()" class="text-2xl font-mono font-bold text-indigo-600 tracking-widest cursor-pointer hover:text-indigo-500 transition-colors select-all">check100</code>
+                    </div>
+                </div>
+
+                <button onclick="closeModal('rewardModal')" class="w-full btn-quest text-white font-bold py-3 rounded-xl shadow-lg transform hover:-translate-y-1 transition-transform flex items-center justify-center gap-2">
+                    <span>รับรางวัล</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden h-full w-full"></div>
+    </div>
 
     <script>
-        // --- Data ---
+        // ... existing code ... (ITEMS data)
         const ITEMS = [
             // === เครื่องสายสากล ===
              { category: "เครื่องสายสากล (Strings)", title: "กีตาร์", en:"Guitar", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กีต้า.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1KWgHzxReWCBwBlFxNfkXw2TLBxXgmT6D" },
@@ -392,7 +397,7 @@
         ];
 
 
-        // --- Elements ---
+        // ... existing code ... (Elements)
         const container = document.getElementById('main-container');
         const searchInput = document.getElementById('searchInput');
         const noResult = document.getElementById('no-result');
@@ -400,7 +405,7 @@
         const tabThai = document.getElementById('tab-thai');
         const tabChinese = document.getElementById('tab-chinese');
 
-        // --- State Management ---
+        // ... existing code ... (State Management)
         let currentTab = sessionStorage.getItem('musicApp_tab') || 'สากล';
         let searchText = sessionStorage.getItem('musicApp_search') || '';
 
@@ -411,7 +416,107 @@
             sessionStorage.setItem('musicApp_search', searchText);
         }
 
-        // --- Styles for Active/Inactive Tabs ---
+        // --- Daily Check-in Logic ---
+        const STORAGE_KEY_COUNT = 'musicApp_streak_count';
+        const STORAGE_KEY_DATE = 'musicApp_last_checkin_date';
+        
+        function getTodayDateString() {
+            const today = new Date();
+            return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+        }
+
+        function updateStreakUI() {
+            const count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
+            const max = 100;
+            const percentage = Math.min((count / max) * 100, 100);
+
+            // Update Counts
+            document.getElementById('streakCountDesktop').innerText = count;
+            document.getElementById('streakCountMobile').innerText = count;
+
+            // Update Progress Bars
+            document.getElementById('questBarDesktop').style.width = `${percentage}%`;
+            document.getElementById('questBarMobile').style.width = `${percentage}%`;
+
+            // Update Lock Icon
+            const lockIcon = count >= 100 ? '🔓' : '🔒';
+            document.getElementById('rewardLockDesktop').innerText = lockIcon;
+            document.getElementById('rewardLockMobile').innerText = lockIcon;
+        }
+        
+        function copyCode() {
+            const code = document.getElementById('secretCode').innerText;
+            navigator.clipboard.writeText(code);
+            alert('คัดลอกโค้ดแล้ว: ' + code);
+        }
+
+        function handleDailyCheckIn() {
+            const todayStr = getTodayDateString();
+            const lastCheckIn = localStorage.getItem(STORAGE_KEY_DATE);
+            let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
+
+            if (lastCheckIn === todayStr) {
+                // Already checked in today
+                showAlert('⚠️ แจ้งเตือน', 'คุณได้ทำการเช็คชื่อของวันนี้ไปแล้ว<br>กรุณากลับมาใหม่พรุ่งนี้ครับ');
+            } else {
+                // Check in success
+                count++;
+                localStorage.setItem(STORAGE_KEY_COUNT, count);
+                localStorage.setItem(STORAGE_KEY_DATE, todayStr);
+                
+                updateStreakUI();
+
+                if (count === 100) {
+                    showRewardPopup();
+                } else {
+                    showAlert('✅ เช็คชื่อสำเร็จ!', `คุณเช็คชื่อต่อเนื่องเป็นวันที่ <b>${count}</b> แล้ว<br>อีก ${100-count} วันเพื่อปลดล็อครางวัลลับ!`);
+                }
+            }
+        }
+
+        // --- Modal & Alert Logic ---
+        function showAlert(title, message) {
+            document.getElementById('alertTitle').innerHTML = title;
+            document.getElementById('alertMessage').innerHTML = message;
+            
+            const modal = document.getElementById('alertModal');
+            modal.classList.remove('hidden');
+            // Animate in
+            setTimeout(() => {
+                modal.children[0].classList.remove('scale-95', 'opacity-0');
+                modal.children[0].classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function showRewardPopup() {
+            const modal = document.getElementById('rewardModal');
+            modal.classList.remove('hidden');
+            createConfetti();
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+        }
+
+        function createConfetti() {
+            const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f', '#gold'];
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = ''; // Clear old confetti
+
+            for (let i = 0; i < 50; i++) {
+                const conf = document.createElement('div');
+                conf.classList.add('confetti');
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDelay = Math.random() * 2 + 's';
+                conf.style.opacity = Math.random();
+                container.appendChild(conf);
+            }
+        }
+
+        // ... existing code ... (Tabs & Rendering)
+
         function updateTabStyles() {
             const tabs = [
                 { el: tabInter, name: 'สากล', color: 'bg-indigo-500' },
@@ -421,7 +526,7 @@
 
             tabs.forEach(tab => {
                 // Reset basic classes
-                tab.el.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap active:scale-95";
+                tab.el.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap";
                 
                 if (currentTab === tab.name) {
                     // Active State
@@ -545,55 +650,6 @@
                     container.appendChild(grid);
                 }
             });
-            
-            // Re-apply glow logic for hover on desktop if needed via JS or keep CSS hover
-            // We rely on CSS hover media query for performance
-        }
-
-        // --- Daily Check-in Logic ---
-        function handleCheckIn() {
-            const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-            const lastCheckIn = localStorage.getItem('dailyCheckin_lastDate');
-            let count = parseInt(localStorage.getItem('dailyCheckin_count') || '0');
-
-            if (lastCheckIn === today) {
-                // Already checked in today
-                showModal('⚠️', 'เช็คชื่อไปแล้ว', 'คุณได้เช็คชื่อของวันนี้ไปเรียบร้อยแล้ว  กลับมาใหม่พรุ่งนี้นะครับ เช็คชื่อครบ 100 รับโค๊ดลบโฆษณาถาวร', count, false);
-            } else {
-                // Success Check-in
-                count++;
-                localStorage.setItem('dailyCheckin_count', count);
-                localStorage.setItem('dailyCheckin_lastDate', today);
-                
-                // Check if reached 100 days
-                if (count === 100) {
-                    showModal('🏆', 'สุดยอดไปเลย!', 'ยินดีด้วย! คุณสะสมครบ 100 วันแล้ว  โค้ดลับ รหัสคือ check100 ', count, true);
-                } else {
-                    showModal('✅', 'เช็คชื่อสำเร็จ', 'บันทึกการเข้าใช้งานวันนี้เรียบร้อยแล้ว สะสมให้ครบ 100 วันนะ!', count, false);
-                }
-            }
-        }
-
-        function showModal(icon, title, desc, count, isReward) {
-            document.getElementById('modal-icon').textContent = icon;
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-desc').textContent = desc;
-            document.getElementById('modal-count').textContent = count;
-            
-            const rewardArea = document.getElementById('reward-area');
-            if (isReward) {
-                rewardArea.classList.remove('hidden');
-            } else {
-                rewardArea.classList.add('hidden');
-            }
-
-            document.getElementById('checkin-modal').classList.remove('hidden');
-            document.getElementById('checkin-modal').classList.add('flex');
-        }
-
-        function closeModal() {
-            document.getElementById('checkin-modal').classList.add('hidden');
-            document.getElementById('checkin-modal').classList.remove('flex');
         }
 
         // Listeners
@@ -607,6 +663,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateTabStyles();
             renderCards();
+            updateStreakUI(); // Init check-in count
         });
 
     </script>
