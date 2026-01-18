@@ -40,7 +40,6 @@
             overflow-x: hidden; /* Prevent horizontal scroll */
         }
 
-        /* Glow Text Effect */
         /* --- REDESIGNED Daily Check-in Button (Quest Style) --- */
         .btn-quest {
             background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
@@ -76,13 +75,54 @@
             box-shadow: 0 0 10px #fbbf24;
         }
 
+        /* --- Card Styles --- */
+        .glow-card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 2px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .glow-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            z-index: 10;
+        }
+
+        /* --- FIXED: Image Borders matched to Category (No Glow) --- */
+        .img-container {
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 8px 8px;
+            border-width: 2px;
+            border-style: solid;
+            transition: all 0.3s ease;
+        }
+
+        /* Specific border colors for categories - JUST THE LINE */
+        .img-border-inter { 
+            border-color: #818cf8; 
+        }
+        .img-border-thai { 
+            border-color: #2dd4bf; 
+        }
+        .img-border-chinese { 
+            border-color: #fb7185; 
+        }
+
+        /* Category Specific Glows (Card Borders) */
+        .glow-indigo { border-color: #818cf8; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+        .glow-teal { border-color: #2dd4bf; box-shadow: 0 0 15px rgba(45, 212, 191, 0.2); }
+        .glow-rose { border-color: #fb7185; box-shadow: 0 0 15px rgba(251, 113, 133, 0.2); }
+
         /* Modal Overlay */
         .modal-overlay {
             background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(4px);
         }
 
-        /* Confetti Animation for Reward */
+        /* Confetti Animation */
         @keyframes confetti-fall {
             0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
             100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
@@ -95,6 +135,122 @@
             animation: confetti-fall 3s linear forwards;
             top: -10px;
             z-index: 60;
+        }
+
+        /* --- Chatbot Styles --- */
+        .chat-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .chat-fab:hover { transform: scale(1.1) rotate(5deg); }
+        
+        .chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            max-height: 80vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 49;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform-origin: bottom right;
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .chat-window.hidden-chat {
+            transform: scale(0);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .chat-header {
+            background: linear-gradient(to right, #4f46e5, #8b5cf6);
+            padding: 15px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: #4f46e5;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background-color: white;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .chat-input-area {
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Typing Indicator */
+        .typing-dots span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+            margin: 0 2px;
+        }
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
         }
 
     </style>
@@ -120,7 +276,7 @@
                         </div>
                     </div>
 
-                    <!-- Daily Check-in Button (Mobile) - Redesigned -->
+                    <!-- Daily Check-in Button (Mobile) -->
                     <button onclick="handleDailyCheckIn()" id="checkInBtn" class="md:hidden btn-quest pl-2 pr-3 py-1.5 rounded-full text-white text-xs font-bold flex items-center gap-2 transition-transform active:scale-95 group">
                         <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
                             <span class="text-sm">📅</span>
@@ -134,7 +290,6 @@
                                 <span id="streakCountMobile" class="text-sm font-bold text-yellow-300">0</span>
                                 <span class="text-[10px] opacity-80">/100</span>
                              </div>
-                             <!-- Mini Progress Bar Mobile -->
                              <div class="w-full h-1 bg-black/20 rounded-full mt-1 overflow-hidden">
                                  <div id="questBarMobile" class="h-full bg-yellow-400 w-0 transition-all duration-500"></div>
                              </div>
@@ -145,7 +300,7 @@
                 <!-- Controls -->
                 <div class="flex flex-row items-center gap-2 w-full md:w-auto">
                     
-                    <!-- Daily Check-in Button (Desktop) - Redesigned -->
+                    <!-- Daily Check-in Button (Desktop) -->
                     <button onclick="handleDailyCheckIn()" class="hidden md:flex flex-col btn-quest px-4 py-2 rounded-2xl text-white transition-all hover:scale-105 active:scale-95 mr-2 group relative min-w-[140px]">
                         <div class="flex items-center justify-between w-full gap-3">
                             <div class="flex items-center gap-2">
@@ -157,13 +312,12 @@
                             </div>
                             <div class="text-xs opacity-70 bg-black/20 p-1 rounded-md backdrop-blur-sm" id="rewardLockDesktop" title="Secret Code locked">🔒</div>
                         </div>
-                        <!-- Progress Bar Desktop -->
                         <div class="quest-progress-bg">
                             <div id="questBarDesktop" class="quest-progress-bar"></div>
                         </div>
                     </button>
 
-                    <!-- Tabs (Scrollable on very small screens) -->
+                    <!-- Tabs -->
                     <div class="flex p-1 bg-slate-100 rounded-xl w-auto border border-slate-200 shrink-0 overflow-x-auto">
                         <button onclick="switchTab('สากล')" id="tab-inter" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">สากล</button>
                         <button onclick="switchTab('ไทย')" id="tab-thai" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap">ไทย</button>
@@ -195,6 +349,44 @@
         <p class="text-sm font-bold text-slate-500">ไม่พบข้อมูล...</p>
     </div>
 
+    <!-- === AI CHATBOT SYSTEM === -->
+    
+    <!-- Floating Action Button -->
+    <button id="chatFab" onclick="toggleChat()" class="chat-fab">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        </svg>
+    </button>
+
+    <!-- Chat Window -->
+    <div id="chatWindow" class="chat-window hidden-chat">
+        <div class="chat-header">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span class="font-bold">Music Guru AI</span>
+            </div>
+            <button onclick="toggleChat()" class="hover:bg-white/20 rounded-full p-1 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div id="chatMessages" class="chat-messages">
+            <!-- Messages will appear here -->
+            <div class="message bot">
+                สวัสดีครับ! ผมคือผู้ช่วย Music Guru 🎵<br>สอบถามข้อมูลดนตรีได้เลยครับ
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="พิมพ์ข้อความ..." class="flex-1 border border-slate-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50" onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()" class="bg-primary text-white rounded-full w-9 h-9 flex items-center justify-center hover:bg-indigo-600 transition-colors shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9-2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <!-- === MODALS SYSTEM === -->
     
     <!-- 1. General Alert Modal -->
@@ -211,9 +403,7 @@
     <!-- 2. Special Reward Modal (100 Days) -->
     <div id="rewardModal" class="hidden fixed inset-0 z-[101] modal-overlay flex items-center justify-center px-4">
         <div class="bg-gradient-to-br from-yellow-50 to-amber-100 rounded-3xl shadow-2xl p-8 max-w-sm w-full transform transition-all scale-100 text-center relative border-4 border-white/50 overflow-hidden">
-            <!-- Glow background -->
             <div class="absolute inset-0 bg-yellow-400 opacity-10 blur-xl rounded-full"></div>
-            <!-- Spotlight effect -->
             <div class="absolute -top-20 -left-20 w-40 h-40 bg-white opacity-20 blur-3xl rounded-full"></div>
             
             <div class="relative z-10">
@@ -221,14 +411,13 @@
                 <h3 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-yellow-600 mb-2 font-display uppercase tracking-tight">Mission Complete!</h3>
                 <p class="text-amber-800 font-medium mb-6 text-sm">สุดยอด! คุณเช็คชื่อครบ 100 วันแล้ว<br>นี่คือรางวัลความพยายามของคุณ</p>
                 
-                <!-- Secret Code Box -->
                 <div class="group relative bg-white rounded-2xl p-1 shadow-inner border border-amber-200 mb-6 transform transition-transform hover:scale-105">
                     <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow-sm">
                         SECRET CODE
                     </div>
                     <div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-4 flex flex-col items-center justify-center gap-2 group-hover:border-amber-400 transition-colors">
                          <div class="text-xs text-slate-400 mb-1">แตะเพื่อคัดลอก</div>
-                         <code id="secretCode" onclick="copyCode()" class="text-2xl font-mono font-bold text-indigo-600 tracking-widest cursor-pointer hover:text-indigo-500 transition-colors select-all">check100</code>
+                         <code id="secretCode" onclick="copyCode()" class="text-2xl font-mono font-bold text-indigo-600 tracking-widest cursor-pointer hover:text-indigo-500 transition-colors select-all">MUSIC-MASTER-100</code>
                     </div>
                 </div>
 
@@ -244,7 +433,11 @@
     </div>
 
     <script>
-        // ... existing code ... (ITEMS data)
+        // *** CONFIGURATION: CLOUDFLARE WORKER URL ***
+        // ใส่ URL ของ Cloudflare Worker ของคุณที่นี่
+        const CLOUDFLARE_WORKER_URL = 'https://winter-sun-5411.tontakankeawpang.workers.dev/'; 
+
+        // ... existing items ...
         const ITEMS = [
             // === เครื่องสายสากล ===
              { category: "เครื่องสายสากล (Strings)", title: "กีตาร์", en:"Guitar", url: "https://tontakankeawpang321-glitch.github.io/musicdontreechakonthai/กีต้า.html", badge: "สากล", img: "https://lh3.googleusercontent.com/d/1KWgHzxReWCBwBlFxNfkXw2TLBxXgmT6D" },
@@ -397,7 +590,7 @@
         ];
 
 
-        // ... existing code ... (Elements)
+        // ... (ตัวแปรและฟังก์ชันเดิมยังคงอยู่ครบถ้วน) ...
         const container = document.getElementById('main-container');
         const searchInput = document.getElementById('searchInput');
         const noResult = document.getElementById('no-result');
@@ -405,7 +598,6 @@
         const tabThai = document.getElementById('tab-thai');
         const tabChinese = document.getElementById('tab-chinese');
 
-        // ... existing code ... (State Management)
         let currentTab = sessionStorage.getItem('musicApp_tab') || 'สากล';
         let searchText = sessionStorage.getItem('musicApp_search') || '';
 
@@ -416,7 +608,6 @@
             sessionStorage.setItem('musicApp_search', searchText);
         }
 
-        // --- Daily Check-in Logic ---
         const STORAGE_KEY_COUNT = 'musicApp_streak_count';
         const STORAGE_KEY_DATE = 'musicApp_last_checkin_date';
         
@@ -430,15 +621,12 @@
             const max = 100;
             const percentage = Math.min((count / max) * 100, 100);
 
-            // Update Counts
             document.getElementById('streakCountDesktop').innerText = count;
             document.getElementById('streakCountMobile').innerText = count;
 
-            // Update Progress Bars
             document.getElementById('questBarDesktop').style.width = `${percentage}%`;
             document.getElementById('questBarMobile').style.width = `${percentage}%`;
 
-            // Update Lock Icon
             const lockIcon = count >= 100 ? '🔓' : '🔒';
             document.getElementById('rewardLockDesktop').innerText = lockIcon;
             document.getElementById('rewardLockMobile').innerText = lockIcon;
@@ -456,10 +644,8 @@
             let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
 
             if (lastCheckIn === todayStr) {
-                // Already checked in today
                 showAlert('⚠️ แจ้งเตือน', 'คุณได้ทำการเช็คชื่อของวันนี้ไปแล้ว<br>กรุณากลับมาใหม่พรุ่งนี้ครับ');
             } else {
-                // Check in success
                 count++;
                 localStorage.setItem(STORAGE_KEY_COUNT, count);
                 localStorage.setItem(STORAGE_KEY_DATE, todayStr);
@@ -474,14 +660,12 @@
             }
         }
 
-        // --- Modal & Alert Logic ---
         function showAlert(title, message) {
             document.getElementById('alertTitle').innerHTML = title;
             document.getElementById('alertMessage').innerHTML = message;
             
             const modal = document.getElementById('alertModal');
             modal.classList.remove('hidden');
-            // Animate in
             setTimeout(() => {
                 modal.children[0].classList.remove('scale-95', 'opacity-0');
                 modal.children[0].classList.add('scale-100', 'opacity-100');
@@ -502,7 +686,7 @@
         function createConfetti() {
             const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f', '#gold'];
             const container = document.getElementById('confetti-container');
-            container.innerHTML = ''; // Clear old confetti
+            container.innerHTML = ''; 
 
             for (let i = 0; i < 50; i++) {
                 const conf = document.createElement('div');
@@ -515,8 +699,6 @@
             }
         }
 
-        // ... existing code ... (Tabs & Rendering)
-
         function updateTabStyles() {
             const tabs = [
                 { el: tabInter, name: 'สากล', color: 'bg-indigo-500' },
@@ -525,11 +707,9 @@
             ];
 
             tabs.forEach(tab => {
-                // Reset basic classes
                 tab.el.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap";
                 
                 if (currentTab === tab.name) {
-                    // Active State
                     if(tab.name === 'สากล') {
                         tab.el.classList.add('bg-indigo-500', 'text-white', 'shadow-md', 'shadow-indigo-500/30', 'transform', '-translate-y-0.5');
                     } else if (tab.name === 'ไทย') {
@@ -538,7 +718,6 @@
                         tab.el.classList.add('bg-rose-500', 'text-white', 'shadow-md', 'shadow-rose-500/30', 'transform', '-translate-y-0.5');
                     }
                 } else {
-                    // Inactive State
                     tab.el.classList.add('text-slate-500', 'hover:bg-white', 'hover:text-slate-800');
                 }
             });
@@ -561,7 +740,6 @@
             const tabItems = ITEMS.filter(item => item.badge === currentTab);
             const categorizedItems = new Map();
 
-            // Filter & Categorize
             tabItems.forEach(item => {
                 if (item.title.toLowerCase().includes(filterLower) || item.en.toLowerCase().includes(filterLower)) {
                     if (!categorizedItems.has(item.category)) {
@@ -572,7 +750,6 @@
                 }
             });
 
-            // No Results Check
             if (!hasAnyResult) {
                 noResult.classList.remove('hidden');
                 noResult.classList.add('flex');
@@ -581,14 +758,12 @@
                 noResult.classList.remove('flex');
             }
 
-            // Ordering Categories
             const categoriesOrder = [...new Set(ITEMS.map(item => item.category))];
 
             categoriesOrder.forEach(cat => {
                 const groupItems = categorizedItems.get(cat);
 
                 if (groupItems && groupItems.length > 0) {
-                    // Category Header
                     const headerContainer = document.createElement('div');
                     headerContainer.className = "flex items-center gap-2 mb-3 mt-6";
                     
@@ -598,7 +773,6 @@
                     const headerTitle = document.createElement('h2');
                     headerTitle.className = "text-lg font-bold text-slate-700";
                     
-                    // Simple logic to shorten category name if needed on mobile
                     let displayCat = cat.replace("เครื่อง", "").replace("ดนตรี", "");
                     if(window.innerWidth > 640) displayCat = cat;
 
@@ -608,7 +782,6 @@
                     headerContainer.appendChild(headerLine);
                     container.appendChild(headerContainer);
 
-                    // Grid Layout (3 columns on mobile, 4 on sm, etc.)
                     const grid = document.createElement('div');
                     grid.className = "grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-4";
 
@@ -618,26 +791,30 @@
                         card.target = item.url !== "#" ? "_blank" : "_self";
                         card.rel = "noopener noreferrer";
                         
-                        // Set Glow Color Class
                         let glowClass = 'glow-indigo text-indigo-500';
-                        if (item.badge === 'ไทย') glowClass = 'glow-teal text-teal-500';
-                        if (item.badge === 'จีน') glowClass = 'glow-rose text-rose-500';
+                        let imgBorderClass = 'img-border-inter';
 
-                        // Card Structure
+                        if (item.badge === 'ไทย') {
+                            glowClass = 'glow-teal text-teal-500';
+                            imgBorderClass = 'img-border-thai';
+                        }
+                        if (item.badge === 'จีน') {
+                            glowClass = 'glow-rose text-rose-500';
+                            imgBorderClass = 'img-border-chinese';
+                        }
+
                         card.className = `glow-card ${glowClass} p-2 flex flex-col items-center justify-between min-h-[140px]`;
 
                         const imgUrl = item.img;
 
                         card.innerHTML = `
-                            <!-- Image -->
-                            <div class="img-container w-full aspect-square mb-2 rounded-lg flex items-center justify-center p-2 relative overflow-hidden bg-slate-50 border border-slate-100/50">
+                            <div class="img-container ${imgBorderClass} w-full aspect-square mb-2 rounded-lg flex items-center justify-center p-2 relative overflow-hidden bg-slate-50">
                                 ${imgUrl ? 
                                     `<img src="${imgUrl}" alt="${item.title}" class="w-full h-full object-contain drop-shadow-sm" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'text-[9px] text-slate-400\\'>NO IMG</span>';">` 
                                     : `<span class="text-[9px] text-slate-400">NO IMG</span>`
                                 }
                             </div>
                             
-                            <!-- Texts with Glow -->
                             <div class="text-center w-full z-10 pb-1">
                                 <h3 class="font-bold text-slate-700 text-xs md:text-sm leading-tight text-glow line-clamp-1">
                                     ${item.title}
@@ -652,6 +829,81 @@
             });
         }
 
+        // --- Chatbot Logic ---
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.classList.toggle('hidden-chat');
+        }
+
+        function appendMessage(sender, text) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            msgDiv.innerHTML = text; // Using innerHTML to allow simple formatting
+            messagesContainer.appendChild(msgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById('chatInput');
+            const message = inputField.value.trim();
+
+            if (!message) return;
+
+            // 1. Show User Message
+            appendMessage('user', message);
+            inputField.value = '';
+
+            // 2. Show Loading/Thinking Indicator
+            const messagesContainer = document.getElementById('chatMessages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message bot typing-dots';
+            loadingDiv.id = 'loadingIndicator';
+            loadingDiv.innerHTML = '<span></span><span></span><span></span>';
+            messagesContainer.appendChild(loadingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // 3. Connect to Cloudflare Worker
+            try {
+                // IMPORTANT: Replace CLOUDFLARE_WORKER_URL with your actual endpoint
+                // If the URL is just a placeholder, simulate a response
+                if (CLOUDFLARE_WORKER_URL.includes('your-worker-name')) {
+                    // Simulate delay for demo purposes if no real URL is set
+                    setTimeout(() => {
+                        loadingDiv.remove();
+                        appendMessage('bot', `⚠️ <b>ยังไม่ได้เชื่อมต่อ Worker:</b><br>กรุณาแก้ตัวแปร <code>CLOUDFLARE_WORKER_URL</code> ในโค้ดบรรทัดที่ 595 ให้เป็น URL ของ Cloudflare Worker ของคุณก่อนครับ<br><br>ข้อความของคุณคือ: "${message}"`);
+                    }, 1000);
+                    return;
+                }
+
+                const response = await fetch(CLOUDFLARE_WORKER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                
+                // Remove loading
+                loadingDiv.remove();
+
+                // 4. Show AI Response
+                // Adjust 'data.response' or 'data.reply' based on your Worker's JSON structure
+                const aiReply = data.response || data.reply || data.message || JSON.stringify(data);
+                appendMessage('bot', aiReply);
+
+            } catch (error) {
+                loadingDiv.remove();
+                appendMessage('bot', `❌ เกิดข้อผิดพลาด: ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (${error.message})`);
+            }
+        }
+
         // Listeners
         searchInput.addEventListener('input', (e) => {
             searchText = e.target.value;
@@ -659,11 +911,10 @@
             renderCards();
         });
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             updateTabStyles();
             renderCards();
-            updateStreakUI(); // Init check-in count
+            updateStreakUI();
         });
 
     </script>
