@@ -2,53 +2,22 @@
 <html lang="th">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>MusicLib - คลังเครื่องดนตรีและชุมชน</title>
-    <meta name="description" content="คลังเครื่องดนตรีสากล ดนตรีไทย และดนตรีจีน พร้อมระบบเล่นเครื่องดนตรีเสถียร ปิดเสียงอัตโนมัติเมื่อออกหรือพับหน้าจอ และกระดานชุมชน" />
-    <meta property="og:title" content="MusicLib - คลังเครื่องดนตรีและชุมชน" />
-    <meta property="og:description" content="คลังเครื่องดนตรีสากล ดนตรีไทย และดนตรีจีน พร้อมระบบเล่นเครื่องดนตรีเสถียร ปิดเสียงอัตโนมัติเมื่อออกหรือพับหน้าจอ และกระดานชุมชน" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Car Care Hub Thailand</title>
+    <meta name="description" content="ศูนย์รวมคาร์แคร์และอู่ซ่อมสีครบวงจรในประเทศไทย ค้นหาบริการใกล้ฉัน ดูแผนที่ และลงประกาศฟรี" />
+    <meta property="og:title" content="Car Care Hub Thailand" />
+    <meta property="og:description" content="ศูนย์รวมคาร์แคร์และอู่ซ่อมสีครบวงจรในประเทศไทย ค้นหาบริการใกล้ฉัน ดูแผนที่ และลงประกาศฟรี" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-      // Polyfill/guard window.fetch descriptor to allow browser extensions to intercept fetch safely
-      (function() {
-        try {
-          var currentFetch = window.fetch;
-          var _fetch = typeof currentFetch === 'function' ? currentFetch.bind(window) : currentFetch;
-          Object.defineProperty(window, 'fetch', {
-            configurable: true,
-            enumerable: true,
-            get: function() {
-              return _fetch;
-            },
-            set: function(val) {
-              _fetch = val;
-            }
-          });
-        } catch (_) {}
-
-        // Prevent browser extension background errors from crashing or cluttering the app
-        window.addEventListener('error', function(event) {
-          if (
-            event &&
-            event.filename &&
-            (event.filename.indexOf('chrome-extension://') !== -1 ||
-             event.filename.indexOf('moz-extension://') !== -1)
-          ) {
-            if (event.preventDefault) event.preventDefault();
-            if (event.stopPropagation) event.stopPropagation();
-            return true;
-          }
-        }, true);
-      })();
-    </script>
-    <script type="module" crossorigin src="/newdontree/assets/index-BbTAxaHc.js"></script>
-    <link rel="stylesheet" crossorigin href="/newdontree/assets/index-CzD7Nje4.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230284c7'/%3E%3Cstop offset='50%25' stop-color='%232563eb'/%3E%3Cstop offset='100%25' stop-color='%234f46e5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Cpath d='M16 40c0-6 4-10 10-10h12c6 0 10 4 10 10v4H16v-4z' fill='%23ffffff'/%3E%3Ccircle cx='23' cy='44' r='4' fill='%230f172a' stroke='%23ffffff' stroke-width='2'/%3E%3Ccircle cx='41' cy='44' r='4' fill='%230f172a' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M22 30l3-8h14l3 8H22z' fill='%23bae6fd'/%3E%3Cpath d='M44 14l1.5 3.5L49 19l-3.5 1.5L44 24l-1.5-3.5L39 19l3.5-1.5z' fill='%23fef08a'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script type="module" crossorigin src="/carcare.io/assets/index-C1c1SkcW.js"></script>
+    <link rel="stylesheet" crossorigin href="/carcare.io/assets/index-CnScfEIy.css">
   </head>
-  <body class="bg-[#f8fafc] text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+  <body class="bg-slate-100 text-slate-800 antialiased selection:bg-sky-500 selection:text-white">
     <div id="root"></div>
   </body>
 </html>
